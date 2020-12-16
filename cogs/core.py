@@ -1,5 +1,7 @@
 """The core of the discord bot."""
 from discord.ext import commands
+import random
+import discord
 
 
 class Core(commands.Cog):
