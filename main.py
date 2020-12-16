@@ -4,6 +4,6 @@ from discord.ext import commands
 
 load_dotenv()
 
-bot = commands.Bot()
+bot = commands.Bot(command_prefix="?")
 
 bot.run(os.environ['DISCORD_TOKEN'])
