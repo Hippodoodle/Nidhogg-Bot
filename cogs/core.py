@@ -24,3 +24,10 @@ class Core(commands.Cog):
         embed = discord.Embed(title=r[random_thing], color=0xFBAED2)
         embed.set_footer(text="Stay hydrated")
         await ctx.message.channel.send(embed=embed)
+
+    @commands.command()
+    async def e(self, ctx, *args):
+        await ctx.message.channel.send(":bug:")
+        await ctx.message.add_reaction("🐛")
+        #await ctx.message.channel.send("<:zavalasmile:700287723247763536>")
+        #await ctx.message.add_reaction("<:zavalasmile:700287723247763536>")
