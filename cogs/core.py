@@ -13,7 +13,7 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(datetime.now())
+        print(datetime.datetime.utcnow())
         print(f'Successfully connected as {self.bot.user}')
 
     @commands.command()
