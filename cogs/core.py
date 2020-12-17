@@ -11,10 +11,10 @@ class Core(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bot.event
+    @commands.Cog.listener()
     async def on_ready(self):
         print(datetime.now())
-        print(f'Successfully connected as {bot.user}')
+        print(f'Successfully connected as {self.bot.user}')
 
     @commands.command()
     async def doodle(self, ctx, *args):
