@@ -3,7 +3,14 @@ from discord.ext import commands
 import random
 import discord
 import datetime
+import os
+import re
 
+def list_compare(a, b):
+    for item in a:
+        if item in b:
+            return True
+    return False
 
 class Core(commands.Cog):
     """The core of the bot."""
@@ -16,11 +23,31 @@ class Core(commands.Cog):
         print(datetime.datetime.utcnow())
         print(f'Successfully connected as {self.bot.user}')
 
-    @commands.command()
-    async def doodle(self, ctx, *args):
-        r = ["You are not alone. You have us.", "Life is challenging. It really is... I don't have many inspirational words for you this time. Just do your best and hopefully that works out.", "Sometimes it's okay to cry.", "Don't start smoking or you'll get nicotine withdrawals if you don't smoke. Then you'll become an asshole.", "Your life makes a difference in this world.", "Be inspired by your idols. Walk your own path.", "No matter how bad things may seem, the pain is only in your head.", "Make the best of all your years, because soon enough the year will be your last.", "Remember to drink water.",
-             "You are the source of your own happiness. Explore what brings you joy.", "Don't be afraid to befriend someone out of your social norms or comfort zone.", "You have to take action to change something. You can't stay in silence and expect something to change.", "Stars cannot shine without darkness", "You're amazing. And one day, someone who matters more to you will know it too.", "Go outside in the sun and park. Read or get away from what you are doing! Distract yourself.", "I just want you all to find what makes you happy and stick to it. Don't get sucked into bad vibes okay?", "Proper sleep is necessary for the body to function at it's best"]
-        random_thing = random.randint(0, len(r))
-        embed = discord.Embed(title=r[random_thing], color=0xFBAED2)
-        embed.set_footer(text="Stay hydrated")
-        await ctx.message.channel.send(embed=embed)
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        """Do things when a message is sent."""
+        if message.author == self.bot.user:
+            return
+
+        f = open("files/moderation_keywords.txt", "rt")
+        moderation_key_words = f.read()
+        moderation_key_words = moderation_key_words.split("\n")
+        log_channel = discord.utils.get(self.bot.get_all_channels(), guild=message.guild ,name='moderation-log')
+        the_message = str(message.content).lower().replace(" ","")
+        to_be_modded = list_compare(moderation_key_words, the_message)
+        modded_message = str(message.content).lower()
+        if to_be_modded:
+            if log_channel != None:
+                embed = discord.Embed(title="Auto Moderation Used", timestamp=datetime.datetime.utcnow(), color=0xed900c)
+                embed.add_field(name="User:", value=message.author, inline=True)
+                embed.add_field(name="User id:", value=message.author.id, inline=True)
+                embed.add_field(name="Nickname:", value=message.author.nick, inline=True)
+                embed.add_field(name="Channel:", value=message.channel, inline=True)
+                embed.add_field(name="Message:", value=message.content, inline=True)
+                await log_channel.send(embed=embed)
+            for key_word in moderation_key_words:
+                modded_message = str(modded_message).replace(key_word, "[REDACTED]")
+            embed2 = discord.Embed(title="Auto Moderation", description= str(message.author) + " Please rephrase your sentence and check that it complies with our rules.", color=0xed900c)
+            embed2.add_field(name="Message:", value=modded_message, inline=False)
+            await message.channel.send(embed=embed2)
+            await message.delete()
