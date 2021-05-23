@@ -29,7 +29,7 @@ class Core(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        f = open("files/moderation_keywords.txt", "rt")
+        f = open("../files/moderation_keywords.txt", "rt")
         moderation_key_words = f.read()
         moderation_key_words = moderation_key_words.split("\n")
         log_channel = discord.utils.get(self.bot.get_all_channels(), guild=message.guild ,name='moderation-log')
