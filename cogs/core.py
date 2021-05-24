@@ -9,17 +9,8 @@ import re
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MODERATION_DIR = os.path.join(BASE_DIR, 'files/moderation_keywords.txt')
-
-WARNING_DIR =  os.path.join(BASE_DIR, 'files/warning_keywords.txt')
 
 
-
-def list_compare(a, b):
-    for item in a:
-        if item in b:
-            return True
-    return False
 
 class Core(commands.Cog):
     """The core of the bot."""
@@ -32,57 +23,40 @@ class Core(commands.Cog):
         print(datetime.datetime.utcnow())
         print(f'Successfully connected as {self.bot.user}')
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        """ Do things when a message is sent. """
 
-        """ Ignore messages from the bot. """
-        if message.author == self.bot.user:
-            return
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def recount(self, ctx: commands.Context, *args):
+        await ctx.message.delete()
+        if ctx.channel.id == 699762298721665158 or ctx.channel.id == 794908427809062912:
+            print("success", args)
+            mes_limit = None
+            bool_limit = False
+            limited = False
+            if args != ():
+                mes_limit = int(args[0])
+                bool_limit = True
+                limited = True
+            previous_message = "0 0"
+            count = 0
+            async for m in ctx.channel.history(limit=None, oldest_first=True):
+                try:
+                    if bool_limit and limited:
+                        count += 1
+                        if count >= mes_limit:
+                            limited = False
+                    if not limited:
+                        pre = previous_message.replace("("," ").split(" ")[0].strip()
+                        pre = re.sub("[^0-9]", " ", pre)
+                        message_content = m.content
+                        #if (int(pre) + 1) != int(cur):
+                        if not message_content.startswith(str(int(pre)+1)):
+                            print("Bad count:", int(previous_message.split(" ")[0]), int(m.content.split(" ")[0]))
+                            #await ctx.channel.send(m.jump_url, delete_after=120)
+                            await ctx.channel.send(m.jump_url)
+                        previous_message = m.content
 
-        """ Open moderation keyword file """
-        try:
-            f = open(MODERATION_DIR, "rt")
-        except FileNotFoundError:
-            print(os.getcwd())
-        moderation_key_words = f.read()
-
-        """ Process moderation keywords into a list """
-        moderation_key_words = moderation_key_words.split("\n")
-
-        """ Get the moderation log channel """
-        log_channel = discord.utils.get(self.bot.get_all_channels(), guild=message.guild ,name='moderation-log')
-
-        """ Process message words into a list """
-        the_message = str(message.content).lower().replace(" ","")
-
-        """ Compare words in each list """
-        to_be_modded = list_compare(moderation_key_words, the_message)
-
-        """ Silence individual users
-
-        if message.author.id == 453226854518751242:
-            to_be_modded = True
-        
-        """
-
-        if to_be_modded:
-            
-            """ Moderation log message handling """
-            if log_channel != None:
-                embed = discord.Embed(title="Auto Moderation Used", timestamp=datetime.datetime.utcnow(), color=0xed900c)
-                embed.add_field(name="User:", value=message.author, inline=True)
-                embed.add_field(name="User id:", value=message.author.id, inline=True)
-                embed.add_field(name="Nickname:", value=message.author.nick, inline=True)
-                embed.add_field(name="Channel:", value=message.channel, inline=True)
-                embed.add_field(name="Message:", value=message.content, inline=True)
-                await log_channel.send(embed=embed)
-            
-            """ Moderated message handling """
-            moderated_message = str(message.content).lower()
-            for key_word in moderation_key_words:
-                moderated_message = str(moderated_message).replace(key_word, "[REDACTED]")
-            embed2 = discord.Embed(title="Auto Moderation", description= str(message.author) + " Please rephrase your sentence and check that it complies with our rules.", color=0xed900c)
-            embed2.add_field(name="Message:", value=moderated_message, inline=False)
-            await message.channel.send(embed=embed2)
-            await message.delete()
+                except ValueError as e:
+                    pass
+                    #print(e, previous_message, m.content)
+            print("done")
