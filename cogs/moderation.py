@@ -1,7 +1,6 @@
 """The moderation commands of the discord bot."""
 from discord.ext import commands
 from unidecode import unidecode
-import random
 import discord
 import datetime
 import os
