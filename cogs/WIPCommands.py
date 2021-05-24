@@ -44,9 +44,18 @@ class WIPCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        """ Counting channel checker listener """
 
         """ Ignore messages from the bot. """
         if message.author == self.bot.user:
             return
-        if self.sus:
-            await message.channel.send("gunny is sus")
+
+        if message.channel.id == 699762298721665158:
+            messages = await message.channel.history(limit=2).flatten()
+
+            pre = messages[1].content.replace("(", " ").split(" ")[0].strip()
+            pre = re.sub("[^0-9]", " ", pre)
+            message_content = messages[0].content
+            if not message_content.startswith(str(int(pre)+1)):
+                await message.channel.send("Check yourself before youwreck yourself.", delete_after=3)
+                await message.delete()
