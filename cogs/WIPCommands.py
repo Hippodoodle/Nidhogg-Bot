@@ -26,7 +26,7 @@ class WIPCommands(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def e(self, ctx, *args):
+    async def testing(self, ctx, *args):
         await ctx.message.channel.send(":bug:")
         await ctx.message.add_reaction("🐛")
         await ctx.message.channel.send("<:zavalasmile:700287723247763536>")
@@ -42,20 +42,3 @@ class WIPCommands(commands.Cog):
             self.sus = False
         await ctx.channel.send(f'Sus has been set to {self.sus}')
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        """ Counting channel checker listener """
-
-        """ Ignore messages from the bot. """
-        if message.author == self.bot.user:
-            return
-
-        if message.channel.id == 699762298721665158:
-            messages = await message.channel.history(limit=2).flatten()
-
-            pre = messages[1].content.replace("(", " ").split(" ")[0].strip()
-            pre = re.sub("[^0-9]", " ", pre)
-            message_content = messages[0].content
-            if not message_content.startswith(str(int(pre)+1)):
-                await message.channel.send("Check yourself before youwreck yourself.", delete_after=3)
-                await message.delete()

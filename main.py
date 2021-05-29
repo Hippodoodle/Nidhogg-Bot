@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from cogs.core import Core
 from cogs.WIPCommands import WIPCommands
 from cogs.moderation import Moderation
+from cogs.counting import Counting
 
 
 
@@ -24,7 +25,10 @@ bot.add_cog(WIPCommands(bot))
 print("WIPCommands cog loaded")
 
 bot.add_cog(Moderation(bot))
-print("Modeartion cog loaded")
+print("Moderation cog loaded")
+
+bot.add_cog(Counting(bot))
+print("Counting cog loaded")
 
 
 print("Running Bot...")
