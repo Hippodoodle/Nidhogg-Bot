@@ -9,19 +9,18 @@ class Counting(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def recount(self, ctx: commands.Context, *args):
         """ Recounts counting-channel, skipping first arg[0] numbers.\n
             Syntax:
-                - ?recount [start_from | 0] [delete_after | None] 
+                - ?recount [start_from | 0] [delete_after | None]
         """
 
         # Only checks messages in counting-channel
         if ctx.channel.id != 699762298721665158:
             return
-        
+
         await ctx.message.delete()
 
         # Initialise variables
@@ -37,7 +36,7 @@ class Counting(commands.Cog):
 
         if len(args) > 1:
             delete_after = int(args[1])
-                
+
         # Iterate over list of all messages in counting-channel
         async for m in ctx.channel.history(limit=None, oldest_first=True):
 
@@ -50,7 +49,7 @@ class Counting(commands.Cog):
                 pre = re.sub("[^0-9]", "", pre)
                 message_content = m.content
 
-                try: 
+                try:
                     if not message_content.startswith(str(int(pre)+1)):
                         print("Bad count:", int(previous_message.split(" ")[0]), int(m.content.split(" ")[0]))
                         await ctx.channel.send(m.jump_url, delete_after=delete_after)
@@ -58,7 +57,6 @@ class Counting(commands.Cog):
                     pass
 
                 previous_message = message_content
-
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -72,7 +70,7 @@ class Counting(commands.Cog):
         if message.channel.id != 699762298721665158:
             return
 
-        # gets the last 2 messages 
+        # gets the last 2 messages
         messages = await message.channel.history(limit=2).flatten()
 
         # Process the older message

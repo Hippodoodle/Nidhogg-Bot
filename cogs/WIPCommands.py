@@ -3,8 +3,6 @@ from discord.ext import commands
 from unidecode import unidecode
 import random
 import discord
-import datetime
-import re
 
 
 class WIPCommands(commands.Cog):
@@ -41,4 +39,3 @@ class WIPCommands(commands.Cog):
         else:
             self.sus = False
         await ctx.channel.send(f'Sus has been set to {self.sus}')
-

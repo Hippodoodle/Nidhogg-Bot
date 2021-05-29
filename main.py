@@ -9,7 +9,6 @@ from cogs.moderation import Moderation
 from cogs.counting import Counting
 
 
-
 load_dotenv()
 
 

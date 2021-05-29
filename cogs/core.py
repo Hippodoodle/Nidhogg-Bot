@@ -1,10 +1,7 @@
 """The core of the discord bot."""
 from discord.ext import commands
-import random
-import discord
 import datetime
 import os
-import re
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
