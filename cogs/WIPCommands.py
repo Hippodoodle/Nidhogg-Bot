@@ -42,8 +42,8 @@ class WIPCommands(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def testing(self, ctx, *args):
-        await ctx.message.channel.send(":bug:")
-        await ctx.message.add_reaction("🐛")
+        bug_message = await ctx.message.channel.send(":bug:")
+        await bug_message.add_reaction("🐛")
         await ctx.message.channel.send("<:zavalasmile:700287723247763536>")
         await ctx.message.add_reaction("<:zavalasmile:700287723247763536>")
         await ctx.message.channel.send("--" + unidecode("boób") + "++" + "boób")

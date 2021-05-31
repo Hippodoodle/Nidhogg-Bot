@@ -114,4 +114,7 @@ class Moderation(commands.Cog):
                 embed_flagged.add_field(name="Nickname:", value=message.author.nick, inline=True)
                 embed_flagged.add_field(name="Channel:", value=message.channel, inline=True)
                 embed_flagged.add_field(name="Message:", value=message.content, inline=True)
-                await log_channel.send("<@&721848925887397890>", embed=embed_flagged)
+                embed_flagged.set_footer(text="Vote 🟩 to keep or 🟥 to remove")
+                flagged_warning_message = await log_channel.send("<@&721848925887397890>", embed=embed_flagged)
+                await flagged_warning_message.add_reaction("🟩")
+                await flagged_warning_message.add_reaction("🟥")
