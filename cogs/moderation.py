@@ -74,8 +74,11 @@ class Moderation(commands.Cog):
 
             # Moderation log message handling
             if log_channel is not None:
-                embed_mod_log = discord.Embed(title="Auto Moderation Used",
-                                              timestamp=datetime.datetime.utcnow(), color=0xed900c)
+                embed_mod_log = discord.Embed(
+                    title="Auto Moderation Used",
+                    timestamp=datetime.datetime.utcnow(),
+                    color=0xed900c
+                )
                 embed_mod_log.add_field(name="User:", value=message.author, inline=True)
                 embed_mod_log.add_field(name="User id:", value=message.author.id, inline=True)
                 embed_mod_log.add_field(name="Nickname:", value=message.author.nick, inline=True)
@@ -88,7 +91,11 @@ class Moderation(commands.Cog):
             moderated_message = unidecode(moderated_message)
             for key_word in moderation_key_words:
                 moderated_message = str(moderated_message).replace(key_word, "[REDACTED]")
-            embed_mod = discord.Embed(title="Auto Moderation", description=str(message.author) + " Please rephrase your sentence and check that it complies with our rules.", color=0xed900c)
+            embed_mod = discord.Embed(
+                title="Auto Moderation",
+                description=str(message.author) + " Please rephrase your sentence and check that it complies with our rules.",
+                color=0xed900c
+            )
             embed_mod.add_field(name="Message:", value=moderated_message, inline=False)
             await message.channel.send(embed=embed_mod)
             await message.delete()
@@ -97,8 +104,11 @@ class Moderation(commands.Cog):
 
             # Moderation log message handling
             if log_channel is not None:
-                embed_flagged = discord.Embed(title="Potential Problematic Word Flagged",
-                                              timestamp=datetime.datetime.utcnow(), color=0xed900c)
+                embed_flagged = discord.Embed(
+                    title="Potential Problematic Word Flagged",
+                    timestamp=datetime.datetime.utcnow(),
+                    color=0xed900c
+                )
                 embed_flagged.add_field(name="User:", value=message.author, inline=True)
                 embed_flagged.add_field(name="User id:", value=message.author.id, inline=True)
                 embed_flagged.add_field(name="Nickname:", value=message.author.nick, inline=True)
