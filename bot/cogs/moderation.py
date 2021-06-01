@@ -1,9 +1,12 @@
 """The moderation commands of the discord bot."""
 from discord.ext import commands
 from unidecode import unidecode
+from bot.models import FlaggedWarning
+from asgiref.sync import sync_to_async
 import discord
 import datetime
 import os
+import django
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -13,11 +16,23 @@ MODERATION_DIR = os.path.join(BASE_DIR, 'files/moderation_keywords.txt')
 FLAGGED_DIR = os.path.join(BASE_DIR, 'files/flagged_keywords.txt')
 
 
-def list_compare(a, b):
+django.setup()
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'clicker_png.settings')
+
+
+def list_compare(a, b) -> bool:
     for item in a:
         if item in b:
             return True
     return False
+
+
+def add_flagged_warning(message_id: int, message_content: str):
+    f = FlaggedWarning.objects.get_or_create(message_id=message_id)[0]
+    f.message_content = message_content
+    f.save()
+    return f
 
 
 class Moderation(commands.Cog):
@@ -118,3 +133,4 @@ class Moderation(commands.Cog):
                 flagged_warning_message = await log_channel.send("<@&721848925887397890>", embed=embed_flagged)
                 await flagged_warning_message.add_reaction("🟩")
                 await flagged_warning_message.add_reaction("🟥")
+                await sync_to_async(add_flagged_warning)(int(flagged_warning_message.id), message.content)

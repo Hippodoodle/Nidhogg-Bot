@@ -1,3 +1,5 @@
 from django.contrib import admin
+from bot.models import FlaggedWarning
 
-# Register your models here.
+
+admin.site.register(FlaggedWarning)
