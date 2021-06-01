@@ -3,4 +3,4 @@ from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse("Nidhogg says HI!")
+    return render(request, 'bot/index.html')
