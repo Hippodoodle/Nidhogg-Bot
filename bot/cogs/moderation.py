@@ -1,7 +1,7 @@
 """The moderation commands of the discord bot."""
 from discord.ext import commands
 from unidecode import unidecode
-from bot.models import FlaggedWarning
+from bot.models import FlaggedWarning, Guild, ModerationLog
 from asgiref.sync import sync_to_async
 import discord
 import datetime
@@ -28,8 +28,12 @@ def list_compare(a, b) -> bool:
     return False
 
 
-def add_flagged_warning(message_id: int, message_content: str):
-    f = FlaggedWarning.objects.get_or_create(message_id=message_id)[0]
+def add_flagged_warning(message_id: int, moderation_log_channel_id: int, message_content: str):
+    log = ModerationLog.objects.filter(channel_id=moderation_log_channel_id)[0]
+    f = FlaggedWarning.objects.get_or_create(
+        message_id=message_id,
+        moderation_log_channel_id=log
+    )[0]
     f.message_content = message_content
     f.save()
     return f
@@ -40,6 +44,30 @@ class Moderation(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def setLog(self, ctx: commands.Context, *args) -> None:
+        """
+        Set the moderation log channel.\n
+        No attributes defaults to looking for a channel with name 'moderation-log'\n
+        Syntax:
+        - ?setLog
+        - ?setLog [channel_id]
+        """
+        g = await sync_to_async(Guild.objects.get_or_create)(guild_id=int(ctx.guild.id))
+        g = g[0]
+        g.name = ctx.guild.name
+        await sync_to_async(g.save)()
+
+        if args != ():
+            channel_id = int(args[0])
+        else:
+            channel_id = int(discord.utils.get(self.bot.get_all_channels(), guild=ctx.guild, name='moderation-log').id)
+
+        log = await sync_to_async(ModerationLog.objects.get_or_create)(channel_id=channel_id, guild=g)
+        log = log[0]
+        await sync_to_async(log.save)()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -133,4 +161,27 @@ class Moderation(commands.Cog):
                 flagged_warning_message = await log_channel.send("<@&721848925887397890>", embed=embed_flagged)
                 await flagged_warning_message.add_reaction("🟩")
                 await flagged_warning_message.add_reaction("🟥")
-                await sync_to_async(add_flagged_warning)(int(flagged_warning_message.id), message.content)
+                await sync_to_async(add_flagged_warning)(int(flagged_warning_message.id), int(log_channel.id), message.content)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        """Do something when a reaction is added to a message"""
+
+        flagged_warning_message_queryset = await sync_to_async(FlaggedWarning.objects.filter)(message_id=int(payload.message_id))
+
+        await sync_to_async(print)(flagged_warning_message_queryset)
+
+        if not await sync_to_async(flagged_warning_message_queryset.exists)():
+            print('a')
+            return
+
+        flagged_warning_message_id = await sync_to_async(lambda x: x[0].message_id)(flagged_warning_message_queryset)
+
+        moderation_log_channel_id = await sync_to_async(lambda x: x[0].moderation_log_channel_id.channel_id)(flagged_warning_message_queryset)
+
+        print(flagged_warning_message_id, type(flagged_warning_message_id))
+        print(moderation_log_channel_id, type(moderation_log_channel_id))
+
+        moderation_channel = discord.Client.get_channel(moderation_log_channel_id)
+
+        # flagged_warning_message = await moderation_channel.fetch_message(int(flagged_warning_message_id))
